@@ -12,7 +12,16 @@
  * The followings are the available model relations:
  * @property GalleryPhoto[] $galleryPhotos
  *
- * @property array $versions
+ * @property array $versions Settings for image auto-generation
+ * @example
+ *  array(
+ *       'small' => array(
+ *              'resize' => array(200, null),
+ *       ),
+ *      'medium' => array(
+ *              'resize' => array(800, null),
+ *      )
+ *  );
  *
  *
  * @author Bogdan Savluk <savluk.bogdan@gmail.com>
