@@ -296,7 +296,7 @@ $(function () {
             '<div class="image-preview"><img src="' + src + '"/></div><div class="caption">';
         if (hasName)res += '<h5>' + name + '</h5>';
         if (hasDesc)res += '<p>' + description + '</p>';
-        res += '</div><input type="hidden" name="oreder[' + id + ']" value="' + rank + '"/><div class="actions">' +
+        res += '</div><input type="hidden" name="order[' + id + ']" value="' + rank + '"/><div class="actions">' +
 
             ((hasName || hasDesc)
                 ? '<span data-photo-id="' + id + '" class="editPhoto btn btn-primary"><i class="icon-edit icon-white"></i></span> '
