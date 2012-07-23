@@ -25,6 +25,7 @@ class GalleryBehavior extends CActiveRecordBehavior
     public $name;
     /** @var boolean does images in gallery need descriptions */
     public $description;
+    private $_gallery;
 
     /** Will create new gallery after save if no associated gallery exists */
     public function afterSave($event)
@@ -78,7 +79,10 @@ class GalleryBehavior extends CActiveRecordBehavior
     /** @return Gallery Returns gallery associated with model */
     public function getGallery()
     {
-        return Gallery::model()->findByPk($this->getOwner()->{$this->idAttribute});
+        if (empty($this->_gallery)) {
+            $this->_gallery = Gallery::model()->findByPk($this->getOwner()->{$this->idAttribute});
+        }
+        return $this->_gallery;
     }
 
     /** @return GalleryPhoto[] Photos from associated gallery */

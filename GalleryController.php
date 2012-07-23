@@ -28,32 +28,6 @@ class GalleryController extends CController
     }
 
     /**
-     * Upload single file thought form with name and description.
-     * On success redirects to returnUrl passed via post.
-     * @param int $gallery_id Gallery Id to upload image
-     * @throws CHttpException
-     */
-    public function actionUpload($gallery_id = null)
-    {
-        if (Yii::app()->getRequest()->getIsPostRequest()) {
-
-            $model = new GalleryPhoto();
-            $model->gallery_id = $gallery_id;
-            if (isset($_POST['GalleryPhoto']))
-                $model->attributes = $_POST['GalleryPhoto'];
-
-            $imageFile = CUploadedFile::getInstance($model, 'image');
-            $model->file_name = $imageFile->getName();
-            $model->save();
-
-            $model->setImage($imageFile->getTempName());
-
-            $this->redirect($_POST['returnUrl']);
-        } else
-            throw new CHttpException(403);
-    }
-
-    /**
      * Method to handle file upload thought XHR2
      * On success returns JSON object with image info.
      * @param $gallery_id string Gallery Id to upload images
@@ -73,7 +47,7 @@ class GalleryController extends CController
             $model->save();
 
             $model->setImage($imageFile->getTempName());
-
+            header("Content-Type: application/json");
             echo CJSON::encode(
                 array(
                     'id' => $model->id,

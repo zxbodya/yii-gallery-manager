@@ -17,27 +17,20 @@ if (!($this->gallery->description)) {
 ?>
 <div class="GalleryEditor<?php echo $cls?>" id="<?php echo $this->id?>">
     <div class="gform">
-        <?php
-        $form = $this->getController()->beginWidget('CActiveForm',
-            array(
-                'action' => Yii::app()->createUrl($this->controllerRoute . '/upload', array('gallery_id' => $this->gallery->id)),
-                'method' => 'post',
-                'htmlOptions' => array('enctype' => 'multipart/form-data'),
-            ));
-        /** @var CActiveForm $form */
-        ?>
         <span class="btn btn-success fileinput-button">
-                <i class="icon-plus icon-white"></i><span><?php echo Yii::t('galleryManager.main', 'Add images…');?></span>
-            <?php echo $form->fileField($model, 'image', array('class' => 'afile', 'accept' => "image/*", 'multiple' => 'true'));?>
-            </span>
+            <i class="icon-plus icon-white"></i>
+            <?php echo Yii::t('galleryManager.main', 'Add images…');?>
+            <?php echo CHtml::activeFileField($model, 'image', array('class' => 'afile', 'accept' => "image/*", 'multiple' => 'true'));?>
+        </span>
 
         <span class="btn disabled edit_selected"><?php echo Yii::t('galleryManager.main', 'Edit selected');?></span>
         <span class="btn disabled remove_selected"><?php echo Yii::t('galleryManager.main', 'Remove selected');?></span>
 
         <label for="select_all_<?php echo $this->id?>" class="btn">
-            <input type="checkbox"
+            <input type="checkbox" style="margin-bottom: 4px;"
                    id="select_all_<?php echo $this->id?>"
-                   class="select_all"/> <?php echo Yii::t('galleryManager.main', 'Select all');?>
+                   class="select_all"/>
+            <?php echo Yii::t('galleryManager.main', 'Select all');?>
         </label>
 
         <!--  progress bar-->
@@ -48,15 +41,10 @@ if (!($this->gallery->description)) {
         </div>-->
         <?php
         echo CHtml::hiddenField('returnUrl', Yii::app()->getRequest()->getUrl() . '#' . $this->id);
-        $this->getController()->endWidget();
         ?>
     </div>
     <hr/>
-    <form
-        method="post"
-        action="<?php echo Yii::app()->createUrl($this->controllerRoute . '/order')?>"
-        class="sorter"
-        >
+    <div class="sorter">
         <div class="images">
             <?php foreach ($this->gallery->galleryPhotos as $photo): ?>
             <div id="<?php echo $this->id . '-' . $photo->id ?>" class="photo">
@@ -79,14 +67,14 @@ if (!($this->gallery->description)) {
                     echo ' <span data-photo-id="' . $photo->id . '" class="deletePhoto btn btn-danger"><i class="icon-remove icon-white"></i></span>';
                     ?>
                 </div>
-                <input type="checkbox" class="photo-select"/>
+                <label>
+                    <input type="checkbox" class="photo-select"/>
+                </label>
             </div>
             <?php endforeach;?>
         </div>
-        <?php echo CHtml::hiddenField('returnUrl', Yii::app()->getRequest()->getUrl() . '#' . $this->id); ?>
-
         <br style="clear: both;"/>
-    </form>
+    </div>
 
     <div class="modal hide editor-modal"> <!-- fade removed because of opera -->
         <div class="modal-header">
@@ -95,11 +83,12 @@ if (!($this->gallery->description)) {
             <h3><?php echo Yii::t('galleryManager.main', 'Edit information')?></h3>
         </div>
         <div class="modal-body">
-            <form action="<?php echo Yii::app()->createUrl($this->controllerRoute . '/changeData')?>"></form>
+            <div class="form"></div>
         </div>
         <div class="modal-footer">
-            <a href="#"
-               class="btn btn-primary save-changes"><?php echo Yii::t('galleryManager.main', 'Save changes')?></a>
+            <a href="#" class="btn btn-primary save-changes">
+                <?php echo Yii::t('galleryManager.main', 'Save changes')?>
+            </a>
             <a href="#" class="btn" data-dismiss="modal"><?php echo Yii::t('galleryManager.main', 'Close')?></a>
         </div>
     </div>
@@ -259,6 +248,7 @@ EOD;
 
 $cs->registerCss($this->id . 'css', $css);
 ?>
+
 <script type="text/javascript">
 $(function () {
     // variables from php
@@ -266,14 +256,18 @@ $(function () {
     var hasDesc = <?php echo $this->gallery->description ? 'true' : 'false' ?>;
 
     var wId = '<?php echo $this->id?>';
-    var ajaxUploadUrl = '<?php echo  Yii::app()->createUrl($this->controllerRoute . '/ajaxUpload', array('gallery_id' => $this->gallery->id))?>';
-    var deleteUrl = '<?php echo  Yii::app()->createUrl($this->controllerRoute . '/delete')?>';
+    var ajaxUploadUrl = <?php echo CJavaScript::encode(Yii::app()->createUrl($this->controllerRoute . '/ajaxUpload', array('gallery_id' => $this->gallery->id)))?>;
+    var deleteUrl = <?php echo CJavaScript::encode(Yii::app()->createUrl($this->controllerRoute . '/delete'))?>;
+    var editorActionUrl = <?php echo CJavaScript::encode(Yii::app()->createUrl($this->controllerRoute . '/changeData'))?>;
+    var sorterActionUrl = <?php echo CJavaScript::encode(Yii::app()->createUrl($this->controllerRoute . '/order'));?>;
+
 
     var $gallery = $('#' + wId);
     var $sorter = $('.sorter', $gallery);
     var $images = $('.images', $sorter);
     var $editorModal = $('.editor-modal');
-    var $editorForm = $('form', $editorModal);
+    var $editorForm = $('.form', $editorModal);
+
 
     function photoEditorTemplate(id, src, name, description) {
         return '<div class="photo-editor">' +
@@ -361,7 +355,7 @@ $(function () {
     bindPhotoEvents($('.photo'));
 
     $('.images', $sorter).sortable().disableSelection().bind("sortstop", function (event, ui) {
-        $.post($sorter.attr('action'), $sorter.serialize() + '&ajax=true', function (data, textStatus, jqXHR) {
+        $.post(sorterActionUrl, $('input', $sorter).serialize() + '&ajax=true', function (data, textStatus, jqXHR) {
             // order saved!
         }, 'json');
     });
@@ -398,12 +392,32 @@ $(function () {
         });
     } else {
         $('.afile', $gallery).on('change', function (e) {
-            this.form.submit();
+            //this.form.submit(); // todo: iframe xhr
+            e.preventDefault();
+            $editorForm.html('');
+
+            $.ajax(
+                ajaxUploadUrl, {
+                    files:$(this),
+                    iframe:true,
+                    dataType:"json"
+                }).done(function (resp) {
+                    var newOne = $(photoTemplate(resp.id, resp.preview, resp.name, resp.description, resp.rank));
+                    bindPhotoEvents(newOne);
+                    $images.append(newOne);
+                    if (hasName || hasDesc)
+                        $editorForm.append($(photoEditorTemplate(resp.id, resp.preview, resp.name, resp.description)));
+
+                    if (hasName || hasDesc) $editorModal.modal('show');
+                });
+
+
         });
     }
 
-    $('.save-changes', $editorModal).click(function () {
-        $.post($editorForm.attr('action'), $editorForm.serialize() + '&ajax=true', function (data, textStatus, jqXHR) {
+    $('.save-changes', $editorModal).click(function (e) {
+        e.preventDefault();
+        $.post(editorActionUrl, $('input,textarea', $editorForm).serialize() + '&ajax=true', function (data, textStatus, jqXHR) {
 
             var count = data.length;
             for (var key = 0; key < count; key++) {
@@ -441,7 +455,8 @@ $(function () {
         return false;
     });
 
-    $('.remove_selected', $gallery).click(function () {
+    $('.remove_selected', $gallery).click(function (e) {
+        e.preventDefault();
         $('.photo.selected', $sorter).each(function () {
             var id = $(this).attr('id').substr((wId + '-').length);
             $.ajax({
@@ -466,11 +481,7 @@ $(function () {
             }).removeClass('selected');
         }
         updateButtons();
-    }).parent().click(function (e) { //label event
-            if ($(e.target).attr('id').substr(10) !== 'select_all' &&
-                $(e.target).attr('for').substr(10) !== 'select_all')
-                $('.select_all', $gallery).prop('checked', !$('.select_all', $gallery).prop('checked')).change();
-        });
+    });
 
 })
 </script>

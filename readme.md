@@ -35,4 +35,41 @@ Using GalleryBehavior
 ----------------------
 Using gallery behavior is possible to add gallery to any model in application.
 
-GalleryBehavior is under development and will be finished soon, so usage examples also will be later.
+To use GalleryBehavior:
+
+1. Add it to your model:
+
+        Example:
+        public function behaviors()
+        {
+            return array(
+                'galleryBehavior' => array(
+                    'class' => 'GalleryBehavior',
+                    'idAttribute' => 'gallery_id',
+                    'versions' => array(
+                        'small' => array(
+                            'centeredpreview' => array(98, 98),
+                        ),
+                        'medium' => array(
+                            'resize' => array(800, null),
+                        )
+                    ),
+                    'name' => true,
+                    'description' => true,
+                )
+            );
+        }
+
+2. Add gallery widget to your view:
+
+        Example:
+        <h2>Product galley</h2>
+        <?php
+        if ($model->galleryBehavior->getGallery() === null) {
+            echo '<p>Before add photos to product gallery, you need to save product</p>';
+        } else {
+            $this->widget('GalleryManager', array(
+                'gallery' => $model->galleryBehavior->getGallery(),
+            ));
+        }
+        ?>

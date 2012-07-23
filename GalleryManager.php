@@ -11,10 +11,21 @@ class GalleryManager extends CWidget
     public $gallery;
     /** @var string Route to gallery controller */
     public $controllerRoute = false;
+    public $assets;
+
+    public function init()
+    {
+        $this->assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
+    }
 
     /** Render widget */
     public function run()
     {
+
+        $cs = Yii::app()->clientScript;
+        $cs->registerCoreScript('jquery');
+        $cs->registerScriptFile($this->assets . '/jquery.iframe-transport.min.js');
+
         if ($this->controllerRoute === null)
             throw new CException('$controllerRoute must be set.', 500);
         $model = new GalleryPhoto();
