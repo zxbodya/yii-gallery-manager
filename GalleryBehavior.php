@@ -28,18 +28,19 @@ class GalleryBehavior extends CActiveRecordBehavior
     private $_gallery;
 
     /** Will create new gallery after save if no associated gallery exists */
-    public function afterSave($event)
+    public function beforeSave($event)
     {
-        parent::afterSave($event);
-        if (empty($this->getOwner()->{$this->idAttribute})) {
-            $gallery = new Gallery();
-            $gallery->name = $this->name;
-            $gallery->description = $this->description;
-            $gallery->versions = $this->versions;
-            $gallery->save();
+        parent::beforeSave($event);
+        if ($event->isValid) {
+            if (empty($this->getOwner()->{$this->idAttribute})) {
+                $gallery = new Gallery();
+                $gallery->name = $this->name;
+                $gallery->description = $this->description;
+                $gallery->versions = $this->versions;
+                $gallery->save();
 
-            $this->getOwner()->{$this->idAttribute} = $gallery->id;
-            $this->getOwner()->saveAttributes($this->getOwner()->getAttributes());
+                $this->getOwner()->{$this->idAttribute} = $gallery->id;
+            }
         }
     }
 
