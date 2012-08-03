@@ -67,9 +67,7 @@ if (!($this->gallery->description)) {
                     echo ' <span data-photo-id="' . $photo->id . '" class="deletePhoto btn btn-danger"><i class="icon-remove icon-white"></i></span>';
                     ?>
                 </div>
-                <label>
-                    <input type="checkbox" class="photo-select"/>
-                </label>
+                <input type="checkbox" class="photo-select"/>
             </div>
             <?php endforeach;?>
         </div>

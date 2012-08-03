@@ -110,7 +110,9 @@
             $('.photo-select', newOne).change(selectChanged);
         }
 
-        bindPhotoEvents($('.photo', $gallery));
+        $('.photo', $gallery).each(function () {
+            bindPhotoEvents(this);
+        });
 
         $('.images', $sorter).sortable().disableSelection().bind("sortstop", function () {
             $.post(opts.arrangeUrl, $('input', $sorter).serialize() + '&ajax=true', function () {
