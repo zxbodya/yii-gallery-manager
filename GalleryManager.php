@@ -18,6 +18,10 @@ class GalleryManager extends CWidget
         $this->assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
     }
 
+
+    public $htmlOptions = array();
+
+
     /** Render widget */
     public function run()
     {
@@ -52,6 +56,19 @@ class GalleryManager extends CWidget
         $src = "$('#{$this->id}').galleryManager({$opts});";
         $cs->registerScript('galleryManager#' . $this->id, $src);
         $model = new GalleryPhoto();
+
+        $cls = "GalleryEditor ";
+        if (!($this->gallery->name)) $cls .= 'no-name';
+
+        if (!($this->gallery->description)) {
+            $cls .= (($cls != ' ') ? '-' : '') . 'no-desc';
+        }
+        if (isset($this->htmlOptions['class']))
+            $this->htmlOptions['class'] .= ' ' . $cls;
+        else
+            $this->htmlOptions['class'] = $cls;
+        $this->htmlOptions['id'] = $this->id;
+
         $this->render('galleryManager', array(
             'model' => $model,
         ));

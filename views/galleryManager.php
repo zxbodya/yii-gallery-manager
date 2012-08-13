@@ -6,16 +6,7 @@
  * @author Bogdan Savluk <savluk.bogdan@gmail.com>
  */
 ?>
-<?php
-$cls = " ";
-if (!($this->gallery->name)) $cls .= 'no-name';
-
-if (!($this->gallery->description)) {
-    $cls .= (($cls != ' ') ? '-' : '') . 'no-desc';
-}
-
-?>
-<div class="GalleryEditor<?php echo $cls?>" id="<?php echo $this->id?>">
+<?php echo CHtml::openTag('div',$this->htmlOptions);?>
     <div class="gform">
         <span class="btn btn-success fileinput-button">
             <i class="icon-plus icon-white"></i>
@@ -90,4 +81,4 @@ if (!($this->gallery->description)) {
             <a href="#" class="btn" data-dismiss="modal"><?php echo Yii::t('galleryManager.main', 'Close')?></a>
         </div>
     </div>
-</div>
+<?php echo CHtml::closeTag('div');?>
