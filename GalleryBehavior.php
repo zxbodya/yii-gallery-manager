@@ -60,6 +60,7 @@ class GalleryBehavior extends CActiveRecordBehavior
     {
         /** @var $gallery Gallery */
         $gallery = Gallery::model()->findByPk($this->getOwner()->{$this->idAttribute});
+        if($gallery == null) return;
         foreach ($gallery->galleryPhotos as $photo) {
             $photo->removeImages();
         }
