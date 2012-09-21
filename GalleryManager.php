@@ -32,7 +32,7 @@ class GalleryManager extends CWidget
         $cs->registerCoreScript('jquery');
         $cs->registerCoreScript('jquery.ui');
 
-        if (defined('YII_DEBUG')) {
+        if (YII_DEBUG) {
             $cs->registerScriptFile($this->assets . '/jquery.iframe-transport.js');
             $cs->registerScriptFile($this->assets . '/jquery.galleryManager.js');
         } else {
