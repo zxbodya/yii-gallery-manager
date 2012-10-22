@@ -18,9 +18,9 @@ CREATE  TABLE IF NOT EXISTS `gallery_photo` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `gallery_id` INT NOT NULL ,
   `rank` INT NOT NULL DEFAULT 0 ,
-  `name` VARCHAR(512) NOT NULL ,
-  `description` TEXT NOT NULL ,
-  `file_name` VARCHAR(128) NOT NULL ,
+  `name` VARCHAR(512) NOT NULL DEFAULT '',
+  `description` TEXT NULL,
+  `file_name` VARCHAR(128) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`) ,
   INDEX `fk_gallery_photo_gallery1` (`gallery_id` ASC) ,
   CONSTRAINT `fk_gallery_photo_gallery1`
