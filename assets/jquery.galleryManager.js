@@ -3,6 +3,8 @@
     function galleryManager(el, options) {
         //Defaults:
         this.defaults = {
+            csrfToken:null,
+            csrfTokenName:null,
             nameLabel:'Name',
             descriptionLabel:'Description',
 
@@ -65,7 +67,7 @@
             $.ajax({
                 type:'POST',
                 url:opts.deleteUrl,
-                data:'id=' + id,
+                data:'id=' + id + (opts.csrfToken ? '&' + opts.csrfTokenName + '=' + opts.csrfToken : ''),
                 success:function (t) {
                     if (t == 'OK') $('#' + opts.wId + '-' + id).remove();
                     else alert(t);
@@ -115,7 +117,7 @@
         });
 
         $('.images', $sorter).sortable().disableSelection().bind("sortstop", function () {
-            $.post(opts.arrangeUrl, $('input', $sorter).serialize() + '&ajax=true', function () {
+            $.post(opts.arrangeUrl, $('input', $sorter).serialize() + '&ajax=true' + (opts.csrfToken ? '&' + opts.csrfTokenName + '=' + opts.csrfToken : ''), function () {
                 // order saved!
             }, 'json');
         });
@@ -131,6 +133,9 @@
                 for (var i = 0; i < filesCount; i++) {
                     var fd = new FormData();
                     fd.append(this.name, this.files[i]);
+                    if (opts.csrfToken) {
+                        fd.append(opts.csrfTokenName, opts.csrfToken);
+                    }
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', opts.uploadUrl, true);
                     xhr.onload = function () {
@@ -157,7 +162,9 @@
                 $editorForm.html('');
 
                 $.ajax(
-                    opts.uploadUrl, {
+                    opts.uploadUrl,
+                    {
+                        data:(opts.csrfToken ? opts.csrfTokenName + '=' + opts.csrfToken : ''),
                         files:$(this),
                         iframe:true,
                         dataType:"json"
@@ -177,7 +184,7 @@
 
         $('.save-changes', $editorModal).click(function (e) {
             e.preventDefault();
-            $.post(opts.updateUrl, $('input, textarea', $editorForm).serialize() + '&ajax=true', function (data) {
+            $.post(opts.updateUrl, $('input, textarea', $editorForm).serialize() + '&ajax=true' + (opts.csrfToken ? '&' + opts.csrfTokenName + '=' + opts.csrfToken : ''), function (data) {
                 var count = data.length;
                 for (var key = 0; key < count; key++) {
                     var p = data[key];
@@ -223,7 +230,7 @@
                 $.ajax({
                     type:'POST',
                     url:opts.deleteUrl,
-                    data:'id=' + id,
+                    data:'id=' + id + (opts.csrfToken ? '&' + opts.csrfTokenName + '=' + opts.csrfToken : ''),
                     success:function (t) {
                         if (t == 'OK') $('#' + opts.wId + '-' + id).remove();
                         else alert(t);

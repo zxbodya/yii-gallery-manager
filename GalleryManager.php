@@ -43,7 +43,7 @@ class GalleryManager extends CWidget
         if ($this->controllerRoute === null)
             throw new CException('$controllerRoute must be set.', 500);
 
-        $opts = CJavaScript::encode(array(
+        $opts = array(
             'hasName:' => $this->gallery->name ? true : false,
             'hasDesc:' => $this->gallery->description ? true : false,
             'uploadUrl' => Yii::app()->createUrl($this->controllerRoute . '/ajaxUpload', array('gallery_id' => $this->gallery->id)),
@@ -52,7 +52,13 @@ class GalleryManager extends CWidget
             'arrangeUrl' => Yii::app()->createUrl($this->controllerRoute . '/order'),
             'nameLabel' => Yii::t('galleryManager.main', 'Name'),
             'descriptionLabel' => Yii::t('galleryManager.main', 'Description'),
-        ));
+        );
+
+        if (Yii::app()->request->enableCsrfValidation) {
+            $opts['csrfTokenName'] = Yii::app()->request->csrfTokenName;
+            $opts['csrfToken'] = Yii::app()->request->csrfToken;
+        }
+        $opts = CJavaScript::encode($opts);
         $src = "$('#{$this->id}').galleryManager({$opts});";
         $cs->registerScript('galleryManager#' . $this->id, $src);
         $model = new GalleryPhoto();
