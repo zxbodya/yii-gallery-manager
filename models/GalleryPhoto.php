@@ -145,7 +145,7 @@ class GalleryPhoto extends CActiveRecord
         foreach ($this->gallery->versions as $version => $actions) {
             $image = Yii::app()->image->load($path);
             foreach ($actions as $method => $args) {
-                call_user_func_array(array($image, $method), $args);
+                call_user_func_array(array($image, $method), is_array($args) ? $args : array($args));
             }
             $image->save($this->galleryDir . '/' . $this->getFileName($version) . '.' . $this->galleryExt);
         }
@@ -186,7 +186,7 @@ class GalleryPhoto extends CActiveRecord
 
             $image = Yii::app()->image->load($this->galleryDir . '/' . $this->getFileName('') . '.' . $this->galleryExt);
             foreach ($actions as $method => $args) {
-                call_user_func_array(array($image, $method), $args);
+                call_user_func_array(array($image, $method), is_array($args) ? $args : array($args));
             }
             $image->save($this->galleryDir . '/' . $this->getFileName($version) . '.' . $this->galleryExt);
         }
