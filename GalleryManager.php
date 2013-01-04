@@ -71,8 +71,7 @@ class GalleryManager extends CWidget
             $opts['csrfToken'] = Yii::app()->request->csrfToken;
         }
         $opts = CJavaScript::encode($opts);
-        $src = "$('#{$this->id}').galleryManager({$opts});";
-        $cs->registerScript('galleryManager#' . $this->id, $src);
+        $cs->registerScript('galleryManager#' . $this->id, "$('#{$this->id}').galleryManager({$opts});");
         $model = new GalleryPhoto();
 
         $cls = "GalleryEditor ";

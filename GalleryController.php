@@ -119,7 +119,7 @@ class GalleryController extends CController
                 $resp[] = array(
                     'id' => $model->id,
                     'rank' => $model->rank,
-                    'name' => (string)$model->name, //todo: something wrong with model - it returns null, but it must return an empty string
+                    'name' => (string)$model->name,
                     'description' => (string)$model->description,
                     'preview' => $model->getPreview(),
                 );
