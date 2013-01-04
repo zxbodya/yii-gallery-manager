@@ -43,6 +43,17 @@ class GalleryManager extends CWidget
         if ($this->controllerRoute === null)
             throw new CException('$controllerRoute must be set.', 500);
 
+        $photos = array();
+        foreach ($this->gallery->galleryPhotos as $photo) {
+            $photos[] = array(
+                'id' => $photo->id,
+                'rank' => $photo->rank,
+                'name' => (string)$photo->name,
+                'description' => (string)$photo->description,
+                'preview' => $photo->getPreview(),
+            );
+        }
+
         $opts = array(
             'hasName:' => $this->gallery->name ? true : false,
             'hasDesc:' => $this->gallery->description ? true : false,
@@ -52,6 +63,7 @@ class GalleryManager extends CWidget
             'arrangeUrl' => Yii::app()->createUrl($this->controllerRoute . '/order'),
             'nameLabel' => Yii::t('galleryManager.main', 'Name'),
             'descriptionLabel' => Yii::t('galleryManager.main', 'Description'),
+            'photos'=>$photos,
         );
 
         if (Yii::app()->request->enableCsrfValidation) {

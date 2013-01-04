@@ -5,6 +5,7 @@
         this.defaults = {
             csrfToken:null,
             csrfTokenName:null,
+
             nameLabel:'Name',
             descriptionLabel:'Description',
 
@@ -14,7 +15,8 @@
             uploadUrl:'',
             deleteUrl:'',
             updateUrl:'',
-            arrangeUrl:''
+            arrangeUrl:'',
+            photos:[]
         };
 
         //Extending options:
@@ -28,18 +30,25 @@
         var $editorModal = $('.editor-modal', $gallery);
         var $editorForm = $('.form', $editorModal);
 
-
+        function htmlEscape(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
         function photoEditorTemplate(id, src, name, description) {
             return '<div class="photo-editor">' +
-                '<div class="preview"><img src="' + src + '" alt=""/></div>' +
+                '<div class="preview"><img src="' + htmlEscape(src) + '" alt=""/></div>' +
                 '<div>' +
                 (opts.hasName
                     ? '<label for="photo_name_' + id + '">' + opts.nameLabel + ':</label>' +
-                    '<input type="text" name="photo[' + id + '][name]" class="input-xlarge" value="' + name + '" id="photo_name_' + id + '"/>'
+                    '<input type="text" name="photo[' + id + '][name]" class="input-xlarge" value="' + htmlEscape(name) + '" id="photo_name_' + id + '"/>'
                     : '') +
                 (opts.hasDesc
                     ? '<label for="photo_description_' + id + '">' + opts.descriptionLabel + ':</label>' +
-                    '<textarea name="photo[' + id + '][description]" rows="3" cols="40" class="input-xlarge" id="photo_description_' + id + '">' + description + '</textarea>'
+                    '<textarea name="photo[' + id + '][description]" rows="3" cols="40" class="input-xlarge" id="photo_description_' + id + '">' + htmlEscape(description) + '</textarea>'
                     : '') +
                 '</div>' +
                 '</div>';
@@ -47,9 +56,9 @@
 
         function photoTemplate(id, src, name, description, rank) {
             var res = '<div id="' + opts.wId + '-' + id + '" class="photo">' +
-                '<div class="image-preview"><img src="' + src + '"/></div><div class="caption">';
-            if (opts.hasName)res += '<h5>' + name + '</h5>';
-            if (opts.hasDesc)res += '<p>' + description + '</p>';
+                '<div class="image-preview"><img src="' + htmlEscape(src) + '"/></div><div class="caption">';
+            if (opts.hasName)res += '<h5>' + htmlEscape(name) + '</h5>';
+            if (opts.hasDesc)res += '<p>' + htmlEscape(description) + '</p>';
             res += '</div><input type="hidden" name="order[' + id + ']" value="' + rank + '"/><div class="actions">' +
 
                 ((opts.hasName || opts.hasDesc)
@@ -250,6 +259,14 @@
             }
             updateButtons();
         });
+
+        for (var i in opts.photos) {
+            var resp = opts.photos[i];
+            var newOne = $(photoTemplate(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank'])).data('data', resp);
+
+            bindPhotoEvents(newOne);
+            $images.append(newOne);
+        }
     }
 
     // The actual plugin
