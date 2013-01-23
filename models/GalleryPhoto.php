@@ -38,7 +38,11 @@ class GalleryPhoto extends CActiveRecord
      */
     public function tableName()
     {
-        return 'gallery_photo';
+        if ($this->dbConnection->tablePrefix !== null)
+            return '{{gallery_photo}}';
+        else
+            return 'gallery_photo';
+
     }
 
     /**
