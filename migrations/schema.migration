@@ -15,7 +15,7 @@ public function up() {
   $this->createTable( 'gallery_photo', array(
       'id' => 'pk',
       'gallery_id' => 'integer NOT NULL',
-      'rank' => 'integer NOT NULL',
+      'rank' => 'integer NOT NULL DEFAULT 0',
       'name' => 'string NOT NULL',
       'description' => 'text',
       'file_name' => 'string NOT NULL'
