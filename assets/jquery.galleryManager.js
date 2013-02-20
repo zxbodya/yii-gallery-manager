@@ -31,8 +31,6 @@
         var $editorModal = $('.editor-modal', $gallery);
         var $editorForm = $('.form', $editorModal);
 
-        var $dropHint = $('.drop-hint', $gallery);
-
         function htmlEscape(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -121,15 +119,11 @@
             updateButtons();
         }
 
-        function bindPhotoEvents(newOne) {
-            $('.deletePhoto', newOne).click(deleteClick);
-            $('.editPhoto', newOne).click(editClick);
-            $('.photo-select', newOne).change(selectChanged);
-        }
+        $images
+            .on('click', '.photo .deletePhoto', deleteClick)
+            .on('click', '.photo .editPhoto', editClick)
+            .on('click', '.photo .photo-select', selectChanged);
 
-        $('.photo', $gallery).each(function () {
-            bindPhotoEvents(this);
-        });
 
         $('.images', $sorter).sortable().disableSelection().bind("sortstop", function () {
             $.post(opts.arrangeUrl, $('input', $sorter).serialize() + '&ajax=true' + csrfParams, function () {
@@ -160,8 +154,6 @@
                         if (this.status == 200) {
                             var resp = JSON.parse(this.response);
                             var newOne = createPhotoElement(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
-
-                            bindPhotoEvents(newOne);
 
                             $images.append(newOne);
                             if (opts.hasName || opts.hasDesc)
@@ -243,7 +235,7 @@
                     dataType:"json"
                 }).done(function (resp) {
                         var newOne = createPhotoElement(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
-                        bindPhotoEvents(newOne);
+
                         $images.append(newOne);
                         if (opts.hasName || opts.hasDesc)
                             $editorForm.append(createEditorElement(resp['id'], resp['preview'], resp['name'], resp['description']));
@@ -327,8 +319,6 @@
         for (var i in opts.photos) {
             var resp = opts.photos[i];
             var newOne = createPhotoElement(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']).data('data', resp);
-
-            bindPhotoEvents(newOne);
             $images.append(newOne);
         }
     }

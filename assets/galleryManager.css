@@ -113,6 +113,9 @@
     margin-bottom: 0;
 }
 
+.GalleryEditor .caption h5 {
+    margin: 0;
+}
 .GalleryEditor .caption p {
     height: 40px;
     overflow: hidden;
