@@ -28,4 +28,5 @@ return array(
     'Remove selected' => 'Видалити вибрані',
     'Save changes' => 'Зберегти зміни',
     'Select all' => 'Вибрати все',
+    'Drop Files Here…' => 'Перетяніть файли сюди',
 );

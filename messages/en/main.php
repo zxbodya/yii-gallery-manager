@@ -28,4 +28,5 @@ return array(
     'Remove selected' => '',
     'Save changes' => '',
     'Select all' => '',
+    'Drop Files Here…' => '',
 );

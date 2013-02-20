@@ -31,6 +31,8 @@
         var $editorModal = $('.editor-modal', $gallery);
         var $editorForm = $('.form', $editorModal);
 
+        var $dropHint = $('.drop-hint', $gallery);
+
         function htmlEscape(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -136,16 +138,18 @@
         });
 
 
-        if (typeof window.FormData == 'function') {  // if XHR2 available
-            $('.afile', $gallery).attr('multiple', 'true').on('change', function (e) {
-                e.preventDefault();
-                var filesCount = this.files.length;
+        if (window.FormData !== undefined) { // if XHR2 available
+            var uploadFileName = $('.afile', $gallery).attr('name');
+
+            function multiUpload(files) {
+                var filesCount = files.length;
                 var uploadedCount = 0;
                 $editorForm.empty();
 
                 for (var i = 0; i < filesCount; i++) {
                     var fd = new FormData();
-                    fd.append(this.name, this.files[i]);
+
+                    fd.append(uploadFileName, files[i]);
                     if (opts.csrfToken) {
                         fd.append(opts.csrfTokenName, opts.csrfToken);
                     }
@@ -167,6 +171,58 @@
                     };
                     xhr.send(fd);
                 }
+            }
+
+            (function () { // add drag and drop
+                var el = $gallery[0];
+                var isOver = false;
+                var lastIsOver = false;
+
+                setInterval(function () {
+                    if (isOver != lastIsOver) {
+                        if (isOver) el.classList.add('over');
+                        else el.classList.remove('over');
+                        lastIsOver = isOver
+                    }
+                }, 30);
+
+                function handleDragOver(e) {
+                    e.preventDefault();
+                    isOver = true;
+                    return false;
+                }
+
+                function handleDragLeave() {
+                    isOver = false;
+                    return false;
+                }
+
+                function handleDrop(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+
+                    var files = e.dataTransfer.files;
+                    multiUpload(files);
+
+                    isOver = false;
+                    return false;
+                }
+
+                function handleDragEnd() {
+                    isOver = false;
+                }
+
+
+                el.addEventListener('dragover', handleDragOver, false);
+                el.addEventListener('dragleave', handleDragLeave, false);
+                el.addEventListener('drop', handleDrop, false);
+                el.addEventListener('dragend', handleDragEnd, false);
+            })();
+
+            $('.afile', $gallery).attr('multiple', 'true').on('change', function (e) {
+                e.preventDefault();
+                multiUpload(this.files);
             });
         } else {
             $('.afile', $gallery).on('change', function (e) {
@@ -174,14 +230,18 @@
                 e.preventDefault();
                 $editorForm.empty();
 
-                $.ajax(
-                    opts.uploadUrl,
-                    {
-                        data:(opts.csrfToken ? opts.csrfTokenName + '=' + opts.csrfToken : ''),
-                        files:$(this),
-                        iframe:true,
-                        dataType:"json"
-                    }).done(function (resp) {
+                var data = {};
+                if (opts.csrfToken)
+                    data[opts.csrfTokenName] = opts.csrfToken;
+                $.ajax({
+                    type:'POST',
+                    url:opts.uploadUrl,
+                    data:data,
+                    files:$(this),
+                    iframe:true,
+                    processData:false,
+                    dataType:"json"
+                }).done(function (resp) {
                         var newOne = createPhotoElement(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
                         bindPhotoEvents(newOne);
                         $images.append(newOne);

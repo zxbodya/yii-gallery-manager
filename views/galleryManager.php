@@ -58,4 +58,10 @@
         <a href="#" class="btn" data-dismiss="modal"><?php echo Yii::t('galleryManager.main', 'Close')?></a>
     </div>
 </div>
+<div class="overlay">
+    <div class="overlay-bg">&nbsp;</div>
+    <div class="drop-hint">
+        <span class="drop-hint-info"><?php echo Yii::t('galleryManager.main', 'Drop Files Here…')?></span>
+    </div>
+</div>
 <?php echo CHtml::closeTag('div'); ?>
