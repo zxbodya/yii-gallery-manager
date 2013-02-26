@@ -29,6 +29,8 @@
         var $sorter = $('.sorter', $gallery);
         var $images = $('.images', $sorter);
         var $editorModal = $('.editor-modal', $gallery);
+        var $progressModal = $('.progress-modal', $gallery);
+        var $uploadProgress = $('.upload-progress', $progressModal);
         var $editorForm = $('.form', $editorModal);
 
         function htmlEscape(str) {
@@ -136,6 +138,8 @@
             var uploadFileName = $('.afile', $gallery).attr('name');
 
             function multiUpload(files) {
+                $progressModal.modal('show');
+                $uploadProgress.css('width','5%');
                 var filesCount = files.length;
                 var uploadedCount = 0;
                 $editorForm.empty();
@@ -159,10 +163,17 @@
                             if (opts.hasName || opts.hasDesc)
                                 $editorForm.append(createEditorElement(resp['id'], resp['preview'], resp['name'], resp['description']));
                         }
-                        if (uploadedCount === filesCount && (opts.hasName || opts.hasDesc)) $editorModal.modal('show');
+                        $uploadProgress.css('width',''+(5+95*uploadedCount/filesCount)+'%');
+                        console.log(uploadedCount);
+                        if (uploadedCount === filesCount && (opts.hasName || opts.hasDesc)){
+                            $uploadProgress.css('width','100%');
+                            $progressModal.modal('hide');
+                            $editorModal.modal('show');
+                        }
                     };
                     xhr.send(fd);
                 }
+
             }
 
             (function () { // add drag and drop
@@ -218,9 +229,10 @@
             });
         } else {
             $('.afile', $gallery).on('change', function (e) {
-
                 e.preventDefault();
                 $editorForm.empty();
+                $progressModal.modal('show');
+                $uploadProgress.css('width','5%');
 
                 var data = {};
                 if (opts.csrfToken)
@@ -240,6 +252,8 @@
                         if (opts.hasName || opts.hasDesc)
                             $editorForm.append(createEditorElement(resp['id'], resp['preview'], resp['name'], resp['description']));
 
+                        $uploadProgress.css('width','100%');
+                        $progressModal.modal('hide');
                         if (opts.hasName || opts.hasDesc) $editorModal.modal('show');
                     });
 

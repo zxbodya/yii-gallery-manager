@@ -41,6 +41,18 @@
     <div class="images"></div>
     <br style="clear: both;"/>
 </div>
+<!-- Upload Progress Modal-->
+<div class="modal hide progress-modal"> <!-- fade removed because of opera -->
+    <div class="modal-header">
+        <h3><?php echo Yii::t('galleryManager.main', 'Uploading images…')?></h3>
+    </div>
+    <div class="modal-body">
+        <div class="progress progress-striped active">
+            <div class="bar upload-progress" style="width: 40%;"></div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal window to edit photo information -->
 <div class="modal hide editor-modal"> <!-- fade removed because of opera -->
     <div class="modal-header">

@@ -28,5 +28,6 @@ return array(
     'Remove selected' => 'Удалить выбранные',
     'Save changes' => 'Сохранить изменения',
     'Select all' => 'Выбрать все',
-    'Drop Files Here…' => 'Перетащите файлы сюда',
+    'Drop Files Here…' => 'Перетащите файлы сюда…',
+    'Uploading images…' => 'Картинки загружаются…',
 );

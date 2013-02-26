@@ -29,4 +29,5 @@ return array(
     'Save changes' => '',
     'Select all' => '',
     'Drop Files Here…' => '',
+    'Uploading images…' => '',
 );

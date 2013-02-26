@@ -29,4 +29,5 @@ return array(
     'Save changes' => 'Зберегти зміни',
     'Select all' => 'Вибрати все',
     'Drop Files Here…' => 'Перетяніть файли сюди',
+    'Uploading images…' => 'Зображення завантажуються',
 );
