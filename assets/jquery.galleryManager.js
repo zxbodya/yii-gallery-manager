@@ -29,8 +29,8 @@
         var $sorter = $('.sorter', $gallery);
         var $images = $('.images', $sorter);
         var $editorModal = $('.editor-modal', $gallery);
-        var $progressModal = $('.progress-modal', $gallery);
-        var $uploadProgress = $('.upload-progress', $progressModal);
+        var $progressOverlay = $('.progress-overlay', $gallery);
+        var $uploadProgress = $('.upload-progress', $progressOverlay);
         var $editorForm = $('.form', $editorModal);
 
         function htmlEscape(str) {
@@ -138,7 +138,7 @@
             var uploadFileName = $('.afile', $gallery).attr('name');
 
             function multiUpload(files) {
-                $progressModal.modal('show');
+                $progressOverlay.show();
                 $uploadProgress.css('width','5%');
                 var filesCount = files.length;
                 var uploadedCount = 0;
@@ -167,7 +167,7 @@
                         console.log(uploadedCount);
                         if (uploadedCount === filesCount && (opts.hasName || opts.hasDesc)){
                             $uploadProgress.css('width','100%');
-                            $progressModal.modal('hide');
+                            $progressOverlay.hide();
                             $editorModal.modal('show');
                         }
                     };
@@ -231,7 +231,7 @@
             $('.afile', $gallery).on('change', function (e) {
                 e.preventDefault();
                 $editorForm.empty();
-                $progressModal.modal('show');
+                $progressOverlay.show();
                 $uploadProgress.css('width','5%');
 
                 var data = {};
@@ -253,7 +253,7 @@
                             $editorForm.append(createEditorElement(resp['id'], resp['preview'], resp['name'], resp['description']));
 
                         $uploadProgress.css('width','100%');
-                        $progressModal.modal('hide');
+                        $progressOverlay.hide();
                         if (opts.hasName || opts.hasDesc) $editorModal.modal('show');
                     });
 
