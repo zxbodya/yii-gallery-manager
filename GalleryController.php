@@ -79,15 +79,17 @@ class GalleryController extends CController
         }
         sort($orders);
         $i = 0;
+        $res = array();
         foreach ($gp as $k => $v) {
             /** @var $p GalleryPhoto */
             $p = GalleryPhoto::model()->findByPk($k);
             $p->rank = $orders[$i];
+            $res[$k]=$orders[$i];
             $p->save(false);
             $i++;
         }
 
-        echo CJSON::encode(array('result' => 'ok'));
+        echo CJSON::encode($res);
 
     }
 

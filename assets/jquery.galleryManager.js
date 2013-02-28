@@ -1,28 +1,29 @@
 (function ($) {
 
+    var galleryDefaults = {
+        csrfToken: null,
+        csrfTokenName: null,
+
+        nameLabel: 'Name',
+        descriptionLabel: 'Description',
+
+        hasName: true,
+        hasDesc: true,
+
+        uploadUrl: '',
+        deleteUrl: '',
+        updateUrl: '',
+        arrangeUrl: '',
+
+        photos: []
+    };
+
     function galleryManager(el, options) {
-        //Defaults:
-        this.defaults = {
-            csrfToken: null,
-            csrfTokenName: null,
-
-            nameLabel: 'Name',
-            descriptionLabel: 'Description',
-
-            hasName: true,
-            hasDesc: true,
-
-            uploadUrl: '',
-            deleteUrl: '',
-            updateUrl: '',
-            arrangeUrl: '',
-            photos: []
-        };
         //Extending options:
-        var opts = $.extend({}, this.defaults, options);
+        var opts = $.extend({}, galleryDefaults, options);
         //code
         var csrfParams = opts.csrfToken ? '&' + opts.csrfTokenName + '=' + opts.csrfToken : '';
-
+        var photos = {}; // photo elements by id
         var $gallery = $(el);
         if (!opts.hasName) {
             if (!opts.hasDesc) $gallery.addClass('no-name-no-desc');
@@ -66,20 +67,59 @@
             return $(html);
         }
 
-        function createPhotoElement(id, src, name, description, rank) {
-            var res = '<div id="' + opts.wId + '-' + id + '" class="photo">' +
-                '<div class="image-preview"><img src="' + htmlEscape(src) + '"/></div><div class="caption">';
-            if (opts.hasName)res += '<h5>' + htmlEscape(name) + '</h5>';
-            if (opts.hasDesc)res += '<p>' + htmlEscape(description) + '</p>';
-            res += '</div><input type="hidden" name="order[' + id + ']" value="' + rank + '"/><div class="actions">' +
+        var photoTemplate = '<div class="photo">' + '<div class="image-preview"><img src=""/></div><div class="caption">';
+        if (opts.hasName)photoTemplate += '<h5></h5>';
+        if (opts.hasDesc)photoTemplate += '<p></p>';
+        photoTemplate += '</div><div class="actions">';
+        if (opts.hasName)photoTemplate += '<span class="editPhoto btn btn-primary"><i class="icon-edit icon-white"></i></span> ';
+        photoTemplate += '<span class="deletePhoto btn btn-danger"><i class="icon-remove icon-white"></i></span>' +
+            '</div><input type="checkbox" class="photo-select"/></div>';
 
-                ((opts.hasName || opts.hasDesc)
-                    ? '<span class="editPhoto btn btn-primary"><i class="icon-edit icon-white"></i></span> '
-                    : '') +
-                '<span class="deletePhoto btn btn-danger"><i class="icon-remove icon-white"></i></span>' +
-                '</div><input type="checkbox" class="photo-select"/></div>';
-            return $(res).data('id', id);
+
+        function addPhoto(id, src, name, description, rank) {
+            var photo = $(photoTemplate);
+            photos[id] = photo;
+            photo.data('id', id);
+            photo.data('rank', rank);
+
+            $('img', photo).attr('src', src);
+            if (opts.hasName) $('.caption h5', photo).text(name);
+            if (opts.hasDesc) $('.caption p', photo).text(description);
+
+            $images.append(photo);
+            return photo;
         }
+
+
+        function editPhotos(ids) {
+            var l = ids.length;
+            var form = $editorForm.empty();
+            for (var i = 0; i < l; i++) {
+                var id = ids[i];
+                var photo = photos[id],
+                    src = $('img', photo).attr('src'),
+                    name = $('.caption h5', photo).text(),
+                    description = $('.caption p', photo).text();
+                form.append(createEditorElement(id, src, name, description));
+            }
+            if (l > 0)$editorModal.modal('show');
+        }
+
+        function removePhotos(ids) {
+            $.ajax({
+                type: 'POST',
+                url: opts.deleteUrl,
+                data: 'id[]=' + ids.join('&id[]=') + csrfParams,
+                success: function (t) {
+                    if (t == 'OK') {
+                        for (var i = 0, l = ids.length; i < l; i++) {
+                            photos[ids[i]].remove();
+                            delete photos[ids[i]];
+                        }
+                    } else alert(t);
+                }});
+        }
+
 
         function deleteClick(e) {
             e.preventDefault();
@@ -87,14 +127,7 @@
             var id = photo.data('id');
             // here can be question to confirm delete
             // if (!confirm(deleteConfirmation)) return false;
-            $.ajax({
-                type: 'POST',
-                url: opts.deleteUrl,
-                data: 'id[]=' + id + csrfParams,
-                success: function (t) {
-                    if (t == 'OK') photo.remove();
-                    else alert(t);
-                }});
+            removePhotos([id]);
             return false;
         }
 
@@ -102,12 +135,7 @@
             e.preventDefault();
             var photo = $(this).closest('.photo');
             var id = photo.data('id');
-            var src = $('img', photo).attr('src');
-            var name = $('.caption h5', photo).text();
-            var description = $('.caption p', photo).text();
-            $editorForm.empty();
-            $editorForm.append(createEditorElement(id, src, name, description));
-            $editorModal.modal('show');
+            editPhotos([id]);
             return false;
         }
 
@@ -137,10 +165,23 @@
 
 
         $('.images', $sorter).sortable().disableSelection().bind("sortstop", function () {
-            $.post(opts.arrangeUrl, $('input', $sorter).serialize() + csrfParams, function () {
-                // order saved!
-                // we can inform user that order saved
-            }, 'json');
+            var data = [];
+            $('.photo', $sorter).each(function () {
+                var t = $(this);
+                data.push('order[' + t.data('id') + ']=' + t.data('rank'));
+            });
+            $.ajax({
+                type: 'POST',
+                url: opts.arrangeUrl,
+                data: data.join('&') + csrfParams,
+                dataType: "json"
+            }).done(function (data) {
+                    for (var id in data[id]) {
+                        photos[id].data('rank', data[id]);
+                    }
+                    // order saved!
+                    // we can inform user that order saved
+                });
         });
 
 
@@ -152,8 +193,7 @@
                 $uploadProgress.css('width', '5%');
                 var filesCount = files.length;
                 var uploadedCount = 0;
-                $editorForm.empty();
-
+                var ids = [];
                 for (var i = 0; i < filesCount; i++) {
                     var fd = new FormData();
 
@@ -167,18 +207,17 @@
                         uploadedCount++;
                         if (this.status == 200) {
                             var resp = JSON.parse(this.response);
-                            var newOne = createPhotoElement(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
-
-                            $images.append(newOne);
-                            if (opts.hasName || opts.hasDesc)
-                                $editorForm.append(createEditorElement(resp['id'], resp['preview'], resp['name'], resp['description']));
+                            addPhoto(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
+                            ids.push(resp['id']);
+                        } else {
+                            // exception !!!
                         }
                         $uploadProgress.css('width', '' + (5 + 95 * uploadedCount / filesCount) + '%');
                         console.log(uploadedCount);
-                        if (uploadedCount === filesCount && (opts.hasName || opts.hasDesc)) {
+                        if (uploadedCount === filesCount) {
                             $uploadProgress.css('width', '100%');
                             $progressOverlay.hide();
-                            $editorModal.modal('show');
+                            if (opts.hasName || opts.hasDesc) editPhotos(ids);
                         }
                     };
                     xhr.send(fd);
@@ -240,7 +279,7 @@
         } else {
             $('.afile', $gallery).on('change', function (e) {
                 e.preventDefault();
-                $editorForm.empty();
+                var ids = [];
                 $progressOverlay.show();
                 $uploadProgress.css('width', '5%');
 
@@ -256,18 +295,12 @@
                     processData: false,
                     dataType: "json"
                 }).done(function (resp) {
-                        var newOne = createPhotoElement(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
-
-                        $images.append(newOne);
-                        if (opts.hasName || opts.hasDesc)
-                            $editorForm.append(createEditorElement(resp['id'], resp['preview'], resp['name'], resp['description']));
-
+                        addPhoto(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
+                        ids.push(resp['id']);
                         $uploadProgress.css('width', '100%');
                         $progressOverlay.hide();
-                        if (opts.hasName || opts.hasDesc) $editorModal.modal('show');
+                        if (opts.hasName || opts.hasDesc) editPhotos(ids);
                     });
-
-
             });
         }
 
@@ -277,7 +310,7 @@
                 var count = data.length;
                 for (var key = 0; key < count; key++) {
                     var p = data[key];
-                    var photo = $('#' + opts.wId + '-' + p.id);
+                    var photo = photos[p.id];
                     $('img', photo).attr('src', p['src']);
                     if (opts.hasName)
                         $('.caption h5', photo).text(p['name']);
@@ -297,18 +330,11 @@
 
         $('.edit_selected', $gallery).click(function (e) {
             e.preventDefault();
-            var cc = 0;
-            var form = $editorForm.empty();
+            var ids = [];
             $('.photo.selected', $sorter).each(function () {
-                cc++;
-                var photo = $(this),
-                    id = photo.attr('id').substr((opts.wId + '-').length),
-                    src = $('img', photo[0]).attr('src'),
-                    name = $('.caption h5', photo[0]).text(),
-                    description = $('.caption p', photo[0]).text();
-                form.append(createEditorElement(id, src, name, description));
+                ids.push($(this).data('id'));
             });
-            if (cc > 0)$editorModal.modal('show');
+            editPhotos(ids);
             return false;
         });
 
@@ -316,19 +342,9 @@
             e.preventDefault();
             var ids = [];
             $('.photo.selected', $sorter).each(function () {
-                ids.push($(this).attr('id').substr((opts.wId + '-').length));
+                ids.push($(this).data('id'));
             });
-            $.ajax({
-                type: 'POST',
-                url: opts.deleteUrl,
-                data: 'id[]=' + ids.join('&id[]=') + csrfParams,
-                success: function (t) {
-                    if (t == 'OK') {
-                        for (var i = 0, l = ids.length; i < l; i++) {
-                            $('#' + opts.wId + '-' + ids[i]).remove();
-                        }
-                    } else alert(t);
-                }});
+            removePhotos(ids);
 
         });
 
@@ -347,8 +363,7 @@
 
         for (var i = 0, l = opts.photos.length; i < l; i++) {
             var resp = opts.photos[i];
-            var newOne = createPhotoElement(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']).data('data', resp);
-            $images.append(newOne);
+            addPhoto(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']).data('data', resp);
         }
     }
 
