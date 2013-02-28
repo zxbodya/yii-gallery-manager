@@ -20,16 +20,19 @@ class GalleryController extends CController
     }
 
     /**
-     * Removes image with id specified in post request.
+     * Removes image with ids specified in post request.
      * On success returns 'OK'
      */
     public function actionDelete()
     {
         $id = $_POST['id'];
-        /** @var $photo GalleryPhoto */
-        $photo = GalleryPhoto::model()->findByPk($id);
-        if ($photo !== null && $photo->delete()) echo 'OK';
-        else throw new CHttpException(400, 'Photo, not found');
+        /** @var $photos GalleryPhoto[] */
+        $photos = GalleryPhoto::model()->findAllByPk($id);
+        foreach ($photos as $photo) {
+            if ($photo !== null) $photo->delete();
+            else throw new CHttpException(400, 'Photo, not found');
+        }
+        echo 'OK';
     }
 
     /**
@@ -42,9 +45,7 @@ class GalleryController extends CController
     {
         $model = new GalleryPhoto();
         $model->gallery_id = $gallery_id;
-        if (isset($_POST['GalleryPhoto']))
-            $model->attributes = $_POST['GalleryPhoto'];
-        $imageFile = CUploadedFile::getInstance($model, 'image');
+        $imageFile = CUploadedFile::getInstanceByName('image');
         $model->file_name = $imageFile->getName();
         $model->save();
 
@@ -85,11 +86,9 @@ class GalleryController extends CController
             $p->save(false);
             $i++;
         }
-        if ($_POST['ajax'] == true) {
-            echo CJSON::encode(array('result' => 'ok'));
-        } else {
-            $this->redirect($_POST['returnUrl']);
-        }
+
+        echo CJSON::encode(array('result' => 'ok'));
+
     }
 
     /**

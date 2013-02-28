@@ -55,15 +55,15 @@ class GalleryManager extends CWidget
         }
 
         $opts = array(
-            'hasName:' => $this->gallery->name ? true : false,
-            'hasDesc:' => $this->gallery->description ? true : false,
+            'hasName' => $this->gallery->name ? true : false,
+            'hasDesc' => $this->gallery->description ? true : false,
             'uploadUrl' => Yii::app()->createUrl($this->controllerRoute . '/ajaxUpload', array('gallery_id' => $this->gallery->id)),
             'deleteUrl' => Yii::app()->createUrl($this->controllerRoute . '/delete'),
             'updateUrl' => Yii::app()->createUrl($this->controllerRoute . '/changeData'),
             'arrangeUrl' => Yii::app()->createUrl($this->controllerRoute . '/order'),
             'nameLabel' => Yii::t('galleryManager.main', 'Name'),
             'descriptionLabel' => Yii::t('galleryManager.main', 'Description'),
-            'photos'=>$photos,
+            'photos' => $photos,
         );
 
         if (Yii::app()->request->enableCsrfValidation) {
@@ -72,23 +72,11 @@ class GalleryManager extends CWidget
         }
         $opts = CJavaScript::encode($opts);
         $cs->registerScript('galleryManager#' . $this->id, "$('#{$this->id}').galleryManager({$opts});");
-        $model = new GalleryPhoto();
 
-        $cls = "GalleryEditor ";
-        if (!($this->gallery->name)) $cls .= 'no-name';
-
-        if (!($this->gallery->description)) {
-            $cls .= (($cls != ' ') ? '-' : '') . 'no-desc';
-        }
-        if (isset($this->htmlOptions['class']))
-            $this->htmlOptions['class'] .= ' ' . $cls;
-        else
-            $this->htmlOptions['class'] = $cls;
         $this->htmlOptions['id'] = $this->id;
+        $this->htmlOptions['class'] = 'GalleryEditor';
 
-        $this->render('galleryManager', array(
-            'model' => $model,
-        ));
+        $this->render('galleryManager');
     }
 
 }
