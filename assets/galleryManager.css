@@ -11,14 +11,15 @@
 }
 
 .GalleryEditor div.gform {
-    padding-top: 4px;
-    clear: left;
-}
-
-.GalleryEditor form {
     margin: 0;
 }
 
+.GalleryEditor div.gform >.btn:first-child{
+    margin-left: 4px;
+}
+.GalleryEditor div.gform .btn{
+    padding: 4px 8px;
+}
 .GalleryEditor .photo {
     position: relative;
     float: left;
@@ -115,10 +116,14 @@
 
 .GalleryEditor .caption h5 {
     margin: 0;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .GalleryEditor .caption p {
-    height: 40px;
+    height: 3em;
     overflow: hidden;
+    font-size: 13px;
 }
 
 /* fixed thumbnail sizes */

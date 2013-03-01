@@ -19,13 +19,13 @@
  * @version $Id: $
  */
 return array(
-    'Add images…' => '',
+    'Add…' => '',
     'Close' => '',
     'Description' => '',
     'Edit information' => '',
-    'Edit selected' => '',
+    'Edit' => '',
     'Name' => '',
-    'Remove selected' => '',
+    'Remove' => '',
     'Save changes' => '',
     'Select all' => '',
     'Drop Files Here…' => '',

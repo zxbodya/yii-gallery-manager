@@ -26,13 +26,14 @@
         var photos = {}; // photo elements by id
         var $gallery = $(el);
         if (!opts.hasName) {
-            if (!opts.hasDesc) $gallery.addClass('no-name-no-desc');
+            if (!opts.hasDesc) {
+                $gallery.addClass('no-name-no-desc');
+                $('.edit_selected',$gallery).hide();
+            }
             else $gallery.addClass('no-name');
 
         } else if (!opts.hasDesc)
             $gallery.addClass('no-desc');
-
-        opts.wId = $gallery.attr('id');
 
         var $sorter = $('.sorter', $gallery);
         var $images = $('.images', $sorter);
@@ -71,8 +72,8 @@
         if (opts.hasName)photoTemplate += '<h5></h5>';
         if (opts.hasDesc)photoTemplate += '<p></p>';
         photoTemplate += '</div><div class="actions">';
-        if (opts.hasName)photoTemplate += '<span class="editPhoto btn btn-primary"><i class="icon-edit icon-white"></i></span> ';
-        photoTemplate += '<span class="deletePhoto btn btn-danger"><i class="icon-remove icon-white"></i></span>' +
+        if (opts.hasName || opts.hasDesc)photoTemplate += '<span class="editPhoto btn btn-primary btn-mini"><i class="icon-pencil icon-white"></i></span> ';
+        photoTemplate += '<span class="deletePhoto btn btn-danger btn-mini"><i class="icon-remove icon-white"></i></span>' +
             '</div><input type="checkbox" class="photo-select"/></div>';
 
 
@@ -164,7 +165,7 @@
             .on('click', '.photo .photo-select', selectChanged);
 
 
-        $('.images', $sorter).sortable().disableSelection().bind("sortstop", function () {
+        $('.images', $sorter).sortable({ tolerance: "pointer" }).disableSelection().bind("sortstop", function () {
             var data = [];
             $('.photo', $sorter).each(function () {
                 var t = $(this);
@@ -183,7 +184,6 @@
                     // we can inform user that order saved
                 });
         });
-
 
         if (window.FormData !== undefined) { // if XHR2 available
             var uploadFileName = $('.afile', $gallery).attr('name');
@@ -363,7 +363,7 @@
 
         for (var i = 0, l = opts.photos.length; i < l; i++) {
             var resp = opts.photos[i];
-            addPhoto(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']).data('data', resp);
+            addPhoto(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
         }
     }
 
