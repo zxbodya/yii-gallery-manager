@@ -189,6 +189,7 @@
             var uploadFileName = $('.afile', $gallery).attr('name');
 
             function multiUpload(files) {
+                if (files.length == 0) return;
                 $progressOverlay.show();
                 $uploadProgress.css('width', '5%');
                 var filesCount = files.length;
