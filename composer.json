@@ -16,6 +16,6 @@
     ],
 
     "require": {
-        "z_bodya/yii-image": "1.0.0"
+        "z_bodya/yii-image": "dev-default"
     }
 }
