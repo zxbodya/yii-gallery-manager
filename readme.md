@@ -84,3 +84,5 @@ Changing image versions for gallery associated with behavior
         :::php
         $models = Model::model()->findAll();
         foreach($models as $model) $model->galleryBehavior->changeConfig();
+
+Note: to run in migration you should define 'webroot' path alias.
