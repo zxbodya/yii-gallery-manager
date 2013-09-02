@@ -47,9 +47,8 @@ class GalleryBehavior extends CActiveRecordBehavior
     /** Will remove associated Gallery before object removal */
     public function beforeDelete($event)
     {
-        if (!empty($this->getOwner()->{$this->idAttribute})) {
-            /** @var $gallery Gallery */
-            $gallery = Gallery::model()->findByPk($this->getOwner()->{$this->idAttribute});
+        $gallery = $this->getGallery();
+        if ($gallery !== null) {
             $gallery->delete();
         }
         parent::beforeDelete($event);
@@ -58,24 +57,23 @@ class GalleryBehavior extends CActiveRecordBehavior
     /** Method for changing gallery configuration and regeneration of images versions */
     public function changeConfig()
     {
-        /** @var $gallery Gallery */
-        $gallery = Gallery::model()->findByPk($this->getOwner()->{$this->idAttribute});
-        if($gallery == null) return;
-        foreach ($gallery->galleryPhotos as $photo) {
-            $photo->removeImages();
+        $gallery = $this->getGallery();
+        if ($gallery == null) return;
+
+        if ($gallery->versions_data != serialize($this->versions)) {
+            foreach ($gallery->galleryPhotos as $photo) {
+                $photo->removeImages();
+            }
+
+            $gallery->name = $this->name;
+            $gallery->description = $this->description;
+            $gallery->versions = $this->versions;
+            $gallery->save();
+
+            foreach ($gallery->galleryPhotos as $photo) {
+                $photo->updateImages();
+            }
         }
-
-        $gallery->name = $this->name;
-        $gallery->description = $this->description;
-        $gallery->versions = $this->versions;
-        $gallery->save();
-
-        foreach ($gallery->galleryPhotos as $photo) {
-            $photo->updateImages();
-        }
-
-        $this->getOwner()->{$this->idAttribute} = $gallery->id;
-        $this->getOwner()->saveAttributes($this->getOwner()->getAttributes());
     }
 
     /** @return Gallery Returns gallery associated with model */

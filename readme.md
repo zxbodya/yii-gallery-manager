@@ -10,7 +10,7 @@ Manual
 4. Add GalleryController to application or module controllerMap.
 5. Configure and save gallery model
 
-        Example:
+        :::php
         $gallery = new Gallery();
         $gallery->name = true;
         $gallery->description = true;
@@ -26,6 +26,7 @@ Manual
 
 6. Render widget for gallery created above:
 
+        :::php
         $this->widget('GalleryManager', array(
             'gallery' => $gallery,
             'controllerRoute' => '/admin/gallery', //route to gallery controller
@@ -73,3 +74,13 @@ To use GalleryBehavior:
             ));
         }
         ?>
+
+
+Changing image versions for gallery associated with behavior
+----------------------------------------------------------
+1. Update your model with new versions configuration
+2. Run following code(best place for it - in migration):
+
+        :::php
+        $models = Model::model()->findAll();
+        foreach($models as $model) $model->galleryBehavior->changeConfig();
