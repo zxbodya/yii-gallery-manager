@@ -214,7 +214,7 @@
                             // exception !!!
                         }
                         $uploadProgress.css('width', '' + (5 + 95 * uploadedCount / filesCount) + '%');
-                        console.log(uploadedCount);
+
                         if (uploadedCount === filesCount) {
                             $uploadProgress.css('width', '100%');
                             $progressOverlay.hide();
