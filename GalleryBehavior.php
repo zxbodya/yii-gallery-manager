@@ -55,12 +55,12 @@ class GalleryBehavior extends CActiveRecordBehavior
     }
 
     /** Method for changing gallery configuration and regeneration of images versions */
-    public function changeConfig()
+    public function changeConfig($force = false)
     {
         $gallery = $this->getGallery();
         if ($gallery == null) return;
 
-        if ($gallery->versions_data != serialize($this->versions)) {
+        if ($gallery->versions_data != serialize($this->versions) || $force) {
             foreach ($gallery->galleryPhotos as $photo) {
                 $photo->removeImages();
             }
