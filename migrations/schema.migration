@@ -10,6 +10,7 @@ public function up() {
       'versions_data' => 'text NOT NULL',
       'name' => 'boolean NOT NULL DEFAULT 1',
       'description' => 'boolean NOT NULL DEFAULT 1'
+      'extension'=> 'VARCHAR(10) NOT NULL DEFAULT \'jpg\'',
     ) );
 
   $this->createTable( 'gallery_photo', array(

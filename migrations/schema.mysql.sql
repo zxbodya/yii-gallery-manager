@@ -7,6 +7,7 @@ CREATE  TABLE IF NOT EXISTS `gallery` (
   `versions_data` TEXT NOT NULL ,
   `name` TINYINT(1) NOT NULL DEFAULT 1 ,
   `description` TINYINT(1) NOT NULL DEFAULT 1 ,
+  `extension` VARCHAR(10) NOT NULL DEFAULT 'jpg',
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
 

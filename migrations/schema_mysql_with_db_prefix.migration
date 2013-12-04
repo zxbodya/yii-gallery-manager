@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `{{gallery}}` (
   `versions_data` text NOT NULL,
   `name` tinyint(1) NOT NULL DEFAULT '1',
   `description` tinyint(1) NOT NULL DEFAULT '1',
+  `extension` VARCHAR(10) NOT NULL DEFAULT 'jpg',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

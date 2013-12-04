@@ -28,6 +28,10 @@
  */
 class Gallery extends CActiveRecord
 {
+    /** @var string Extensions for gallery images */
+    public $extension = 'jpg';
+    /** @var string directory in web root for galleries */
+    public $galleryDir = 'gallery';
     /**
      * Returns the static model of the specified AR class.
      * @param string $className active record class name.
@@ -60,7 +64,7 @@ class Gallery extends CActiveRecord
             array('name, description', 'safe'),
             // The following rule is used by search().
             // Please remove those attributes that should not be searched.
-            array('id, sizes, name, description', 'safe', 'on' => 'search'),
+            array('id, name, description', 'safe', 'on' => 'search'),
         );
     }
 

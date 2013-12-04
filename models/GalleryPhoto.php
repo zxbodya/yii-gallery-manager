@@ -18,11 +18,6 @@
  */
 class GalleryPhoto extends CActiveRecord
 {
-    /** @var string Extensions for gallery images */
-    public $galleryExt = 'jpg';
-    /** @var string directory in web root for galleries */
-    public $galleryDir = 'gallery';
-
     /**
      * Returns the static model of the specified AR class.
      * @param string $className active record class name.
@@ -126,7 +121,7 @@ class GalleryPhoto extends CActiveRecord
 
     public function getPreview()
     {
-        return Yii::app()->request->baseUrl . '/' . $this->galleryDir . '/_' . $this->getFileName('') . '.' . $this->galleryExt;
+        return Yii::app()->request->baseUrl . '/' . $this->gallery->galleryDir . '/_' . $this->getFileName('') . '.' . $this->gallery->extension;
     }
 
     private function getFileName($version = '')
@@ -136,23 +131,39 @@ class GalleryPhoto extends CActiveRecord
 
     public function getUrl($version = '')
     {
-        return Yii::app()->request->baseUrl . '/' . $this->galleryDir . '/' . $this->getFileName($version) . '.' . $this->galleryExt;
+        return Yii::app()->request->baseUrl . '/' . $this->gallery->galleryDir . '/' . $this->getFileName($version) . '.' . $this->gallery->extension;
+    }
+
+
+    public function changeExtension($old, $new)
+    {
+        //convert original
+        Yii::app()->image->load(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName('') . '.' . $old)->save(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName('') . '.' . $new);
+
+        //create image preview for gallery manager
+        Yii::app()->image->load(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName('') . '.' . $old)
+            ->resize(300, null)
+            ->save(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/_' . $this->getFileName('') . '.' . $new);
+
+        $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName('') . '.' . $old);
+        $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/_' . $this->getFileName('') . '.' . $old);
+
     }
 
     public function setImage($path)
     {
         //save image in original size
-        Yii::app()->image->load($path)->save(Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/' . $this->getFileName('') . '.' . $this->galleryExt);
+        Yii::app()->image->load($path)->save(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName('') . '.' . $this->gallery->extension);
         //create image preview for gallery manager
-        Yii::app()->image->load($path)->resize(300, null)->save(Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/_' . $this->getFileName('') . '.' . $this->galleryExt);
+        Yii::app()->image->load($path)->resize(300, null)->save(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/_' . $this->getFileName('') . '.' . $this->gallery->extension);
 
         $this->updateImages();
     }
 
     public function delete()
     {
-        $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/' . $this->getFileName('') . '.' . $this->galleryExt);
-        $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/_' . $this->getFileName('') . '.' . $this->galleryExt);
+        $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName('') . '.' . $this->gallery->extension);
+        $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/_' . $this->getFileName('') . '.' . $this->gallery->extension);
 
         $this->removeImages();
         return parent::delete();
@@ -167,7 +178,7 @@ class GalleryPhoto extends CActiveRecord
     public function removeImages()
     {
         foreach ($this->gallery->versions as $version => $actions) {
-            $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/' . $this->getFileName($version) . '.' . $this->galleryExt);
+            $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName($version) . '.' . $this->gallery->extension);
         }
     }
 
@@ -177,13 +188,13 @@ class GalleryPhoto extends CActiveRecord
     public function updateImages()
     {
         foreach ($this->gallery->versions as $version => $actions) {
-            $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/' . $this->getFileName($version) . '.' . $this->galleryExt);
+            $this->removeFile(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName($version) . '.' . $this->gallery->extension);
 
-            $image = Yii::app()->image->load(Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/' . $this->getFileName('') . '.' . $this->galleryExt);
+            $image = Yii::app()->image->load(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName('') . '.' . $this->gallery->extension);
             foreach ($actions as $method => $args) {
                 call_user_func_array(array($image, $method), is_array($args) ? $args : array($args));
             }
-            $image->save(Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/' . $this->getFileName($version) . '.' . $this->galleryExt);
+            $image->save(Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName($version) . '.' . $this->gallery->extension);
         }
     }
 
@@ -192,7 +203,7 @@ class GalleryPhoto extends CActiveRecord
     private function getSize($version = '')
     {
         if (!isset($this->_sizes[$version])) {
-            $path = Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/' . $this->getFileName($version) . '.' . $this->galleryExt;
+            $path = Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName($version) . '.' . $this->gallery->extension;
             $this->_sizes[$version] = getimagesize($path);
         }
         return $this->_sizes[$version];
