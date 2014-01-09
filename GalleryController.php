@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Backend controller for GalleryManager widget.
  * Provides following features:
@@ -9,7 +10,6 @@
  *
  * @author Bogdan Savluk <savluk.bogdan@gmail.com>
  */
-
 class GalleryController extends CController
 {
     public function filters()
@@ -50,7 +50,8 @@ class GalleryController extends CController
         $model->save();
 
         $model->setImage($imageFile->getTempName());
-        header("Content-Type: application/json");
+        // not "application/json", because  IE8 trying to save response as a file
+        header("Content-Type: text/html");
         echo CJSON::encode(
             array(
                 'id' => $model->id,
@@ -84,7 +85,7 @@ class GalleryController extends CController
             /** @var $p GalleryPhoto */
             $p = GalleryPhoto::model()->findByPk($k);
             $p->rank = $orders[$i];
-            $res[$k]=$orders[$i];
+            $res[$k] = $orders[$i];
             $p->save(false);
             $i++;
         }
