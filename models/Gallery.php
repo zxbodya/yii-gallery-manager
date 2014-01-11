@@ -32,6 +32,7 @@ class Gallery extends CActiveRecord
     public $extension = 'jpg';
     /** @var string directory in web root for galleries */
     public $galleryDir = 'gallery';
+
     /**
      * Returns the static model of the specified AR class.
      * @param string $className active record class name.
@@ -116,7 +117,7 @@ class Gallery extends CActiveRecord
 
     public function getVersions()
     {
-        if (empty($this->_versions)) $this->_versions = unserialize($this->versions_data);
+        if (!isset($this->_versions)) $this->_versions = unserialize($this->versions_data);
         return $this->_versions;
     }
 
@@ -127,8 +128,9 @@ class Gallery extends CActiveRecord
 
     protected function beforeSave()
     {
-        if (!empty($this->_versions))
+        if (isset($this->_versions))
             $this->versions_data = serialize($this->_versions);
+        if (empty($this->versions_data)) $this->versions_data = serialize(array());
         return parent::beforeSave();
     }
 
