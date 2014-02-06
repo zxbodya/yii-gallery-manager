@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Behavior for adding gallery to any model.
  *
@@ -104,12 +105,31 @@ class GalleryBehavior extends CActiveRecordBehavior
     }
 
     /** @return GalleryPhoto[] Photos from associated gallery */
-    public function getGalleryPhotos()
+    public function getPhotos()
     {
         $criteria = new CDbCriteria();
         $criteria->condition = 'gallery_id = :gallery_id';
         $criteria->params[':gallery_id'] = $this->getOwner()->{$this->idAttribute};
         $criteria->order = '`rank` asc';
         return GalleryPhoto::model()->findAll($criteria);
+    }
+
+    /** @return GalleryPhoto[] Photos from associated gallery */
+    public function getFirstPhoto()
+    {
+        $criteria = new CDbCriteria();
+        $criteria->condition = 'gallery_id = :gallery_id';
+        $criteria->params[':gallery_id'] = $this->getOwner()->{$this->idAttribute};
+        $criteria->order = '`rank` asc';
+        return GalleryPhoto::model()->find($criteria);
+    }
+
+    /** @return GalleryPhoto[] Photos from associated gallery */
+    public function getPhotoCount()
+    {
+        $criteria = new CDbCriteria();
+        $criteria->condition = 'gallery_id = :gallery_id';
+        $criteria->params[':gallery_id'] = $this->getOwner()->{$this->idAttribute};
+        return GalleryPhoto::model()->count($criteria);
     }
 }
