@@ -204,7 +204,11 @@ class GalleryPhoto extends CActiveRecord
     {
         if (!isset($this->_sizes[$version])) {
             $path = Yii::getPathOfAlias('webroot') . '/' . $this->gallery->galleryDir . '/' . $this->getFileName($version) . '.' . $this->gallery->extension;
-            $this->_sizes[$version] = getimagesize($path);
+			if(file_exists($path)){
+                $this->_sizes[$version] = getimagesize($path);
+            } else {
+                $this->_sizes[$version] = array(0, 0);
+			}
         }
         return $this->_sizes[$version];
     }
