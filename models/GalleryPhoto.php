@@ -208,5 +208,26 @@ class GalleryPhoto extends CActiveRecord
         }
     }
 
-
+    private $_sizes = array();      
+         
+    private function getSize($version = '')     
+    {       
+        if (!isset($this->_sizes[$version])) {       
+            $path = Yii::getPathOfAlias('webroot') . '/' . $this->galleryDir . '/' . $this->getFileName($version) . '.' . $this->galleryExt;       
+            $this->_sizes[$version] = getimagesize($path);       
+        }       
+        return $this->_sizes[$version];      
+    }       
+            
+    public function getWidth($version = '')     
+    {       
+        $s = $this->getSize($version);       
+        return $s[0];       
+    }       
+            
+    public function getHeight($version = '')        
+    {       
+        $s = $this->getSize($version);       
+        return $s[1];       
+    }
 }
