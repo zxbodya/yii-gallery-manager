@@ -124,6 +124,7 @@
     height: 3em;
     overflow: hidden;
     font-size: 13px;
+    white-space: nowrap;
 }
 
 /* fixed thumbnail sizes */
@@ -216,4 +217,10 @@
 .GalleryEditor .progress-overlay .modal{
     position: relative;
     top: 80px;
+}
+
+.sorter
+{
+    overflow: auto;
+    height: 400px;
 }
